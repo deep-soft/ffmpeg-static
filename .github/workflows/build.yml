@@ -1,0 +1,41 @@
+name: Build
+
+on:
+  push:
+    branches: [ '*' ]
+    tags:
+      - v*
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        include:
+        - os: ubuntu-latest
+          install-deps: |
+             sudo apt-get install -y nasm
+        - os: macOS-latest
+          install-deps: |
+             brew install nasm
+        - os: windows-latest
+          install-deps: |
+             curl -LO https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/win64/nasm-2.14.02-win64.zip
+             7z x nasm-2.14.02-win64.zip
+             cp nasm-2.14.02/nasm.exe /usr/bin/nasm.exe
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Download deps
+      run: |
+        ${{ matrix.install-deps }}
+        ./download.sh
+      shell: bash
+    - name: Build
+      run: ./build.sh
+      shell: bash
