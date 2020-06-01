@@ -44,5 +44,5 @@ cd ffmpeg
 	--extra-cflags=-I../x264/dist/include \
 	--extra-ldflags=-L../x264/dist/lib
 
-make -j$(nproc) V=1
+make
 make install
