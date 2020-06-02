@@ -28,7 +28,7 @@ jobs:
              curl -LO https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/win64/nasm-2.14.02-win64.zip
              7z x nasm-2.14.02-win64.zip
              cp nasm-2.14.02/nasm.exe /usr/bin/nasm.exe
-
+             rm /usr/bin/link.exe
     steps:
     - uses: actions/checkout@v2
     - name: Download deps
@@ -36,6 +36,13 @@ jobs:
         ${{ matrix.install-deps }}
         ./download.sh
       shell: bash
+    - uses: ilammy/msvc-dev-cmd@v1
     - name: Build
       run: ./build.sh
       shell: bash
+    - name: Debug
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: debug.log
+        path: ffmpeg/ffbuild/config.log

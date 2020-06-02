@@ -8,4 +8,5 @@ cd ffmpeg
 
 if [ "$RUNNER_OS" == "Windows" ]; then
 	git apply ../command_limit.patch
+	git apply ../awk.patch
 fi

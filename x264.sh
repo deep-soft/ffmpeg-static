@@ -4,8 +4,8 @@ set -ex
 
 cd x264
 ./configure \
-	--prefix=dist \
-	--exec-prefix=dist \
+	--prefix=../dist \
+	--exec-prefix=../dist \
 	--enable-static \
 	--enable-pic \
 	--enable-strip \

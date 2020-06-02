@@ -4,7 +4,7 @@ set -ex
 
 cd ffmpeg
 ./configure \
-	--prefix=dist \
+	--prefix=../dist \
 	--disable-debug \
 	--enable-static \
 	--disable-shared \
@@ -41,8 +41,9 @@ cd ffmpeg
 	--disable-vaapi \
 	--disable-vdpau \
 	--disable-videotoolbox \
-	--extra-cflags=-I../x264/dist/include \
-	--extra-ldflags=-L../x264/dist/lib
+	--extra-cflags="$FFMPEG_CFLAGS" \
+	--extra-ldflags="$FFMPEG_LIBRARY_PATH" \
+	$FFMPEG_EXTRA_ARGS
 
 make -j$(nproc)
 make install
