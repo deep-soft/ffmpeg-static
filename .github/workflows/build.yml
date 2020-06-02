@@ -10,7 +10,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -20,15 +19,21 @@ jobs:
         - os: ubuntu-latest
           install-deps: |
              sudo apt-get install -y nasm
+          package-cmd: zip -r Linux.zip dist
+          package-file: Linux.zip
         - os: macOS-latest
           install-deps: |
              brew install nasm
+          package-cmd: zip -r macOS.zip dist
+          package-file: macOS.zip
         - os: windows-latest
           install-deps: |
              curl -LO https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/win64/nasm-2.14.02-win64.zip
              7z x nasm-2.14.02-win64.zip
              cp nasm-2.14.02/nasm.exe /usr/bin/nasm.exe
              rm /usr/bin/link.exe
+          package-cmd: 7z a Windows.zip dist
+          package-file: Windows.zip
     steps:
     - uses: actions/checkout@v2
     - name: Download deps
@@ -44,5 +49,17 @@ jobs:
       if: failure()
       uses: actions/upload-artifact@v2
       with:
-        name: debug.log
-        path: ffmpeg/ffbuild/config.log
+        name: debug
+        path: .
+    - name: Package
+      run: ${{ matrix.package-cmd }}
+      shell: bash
+    - name: Publish
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+          files: |
+            ${{ matrix.package-file }}
+          prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

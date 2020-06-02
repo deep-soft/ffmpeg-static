@@ -10,7 +10,6 @@ cd ffmpeg
 	--disable-shared \
 	--enable-pic \
 	--enable-stripping \
-	--disable-programs \
 	--enable-gpl \
 	--enable-libx264 \
 	--disable-bzlib \
