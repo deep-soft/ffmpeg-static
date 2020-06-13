@@ -3,7 +3,7 @@
 set -ex
 
 cd ffmpeg
-./configure \
+PKG_CONFIG_PATH="../dist/lib/pkgconfig" ./configure \
 	--prefix=../dist \
 	--disable-debug \
 	--enable-static \
@@ -34,9 +34,7 @@ cd ffmpeg
 	--disable-cuvid \
 	--disable-d3d11va \
 	--disable-dxva2 \
-	--disable-ffnvcodec \
 	--disable-nvdec \
-	--disable-nvenc \
 	--disable-vaapi \
 	--disable-vdpau \
 	--disable-videotoolbox \
