@@ -1,12 +1,13 @@
 name: Build
 
 on:
-  push:
-    branches: [ '*' ]
-    tags:
-      - v*
-  pull_request:
-    branches: [ master ]
+  workflow_dispatch:
+#  push:
+#    branches: [ '*' ]
+#    tags:
+#      - v*
+#  pull_request:
+#   branches: [ master ]
 
 jobs:
   build-docker:
