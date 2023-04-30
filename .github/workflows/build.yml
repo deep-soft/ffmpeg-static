@@ -74,14 +74,14 @@ jobs:
              brew install nasm
           package-cmd: zip -r macOS.zip dist
           package-file: macOS.zip
-        - os: windows-latest
-          install-deps: |
-             curl -LO https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip
-             7z x nasm-2.15.05-win64.zip
-             cp nasm-2.15.05/nasm.exe /usr/bin/nasm.exe
-             rm /usr/bin/link.exe
-          package-cmd: 7z a Windows.zip dist
-          package-file: Windows.zip
+#        - os: windows-latest
+#          install-deps: |
+#             curl -LO https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip
+#             7z x nasm-2.15.05-win64.zip
+#             cp nasm-2.15.05/nasm.exe /usr/bin/nasm.exe
+#             rm /usr/bin/link.exe
+#          package-cmd: 7z a Windows.zip dist
+#          package-file: Windows.zip
     steps:
     - uses: actions/checkout@v2
 
