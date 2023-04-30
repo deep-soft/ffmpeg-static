@@ -18,16 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { 
-             name: Linux
-             os: ubuntu-latest
-             target: x86_64-unknown-linux-gnu
-            }
-          - { 
-             name: Windows
-             os: ubuntu-latest
-             target: x86_64-w64-mingw32
-            }
+          - { name: Linux,   os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
+          - { name: Windows, os: ubuntu-latest, target: x86_64-w64-mingw32       }
 
     steps:
     - uses: actions/checkout@v2
