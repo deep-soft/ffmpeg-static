@@ -1,3 +1,4 @@
+# 2023-04-30 08:30
 name: Build - latest
 
 on:
@@ -11,16 +12,23 @@ on:
 
 jobs:
   build-docker:
-    name: build-docker
     runs-on: ${{ matrix.job.os }}
     container: docker://hhmhh/ffmpeg_build:latest
     strategy:
       fail-fast: false
       matrix:
         job:
-          - { name: Linux,   os: ubuntu-latest, target: x86_64-unknown-linux-gnu, }
-          - { name: Windows, os: ubuntu-latest, target: x86_64-w64-mingw32,       }
-      
+          - { 
+             name: Linux
+             os: ubuntu-latest
+             target: x86_64-unknown-linux-gnu
+            }
+          - { 
+             name: Windows
+             os: ubuntu-latest
+             target: x86_64-w64-mingw32
+            }
+
     steps:
     - uses: actions/checkout@v2
 
@@ -29,6 +37,12 @@ jobs:
         ${{ matrix.install-deps }}
         ./download.sh
       shell: bash
+
+    - name: Set up MinGW for Windows on Linux
+      if: ${{ matrix.job.target == x86_64-w64-mingw32 }}
+      uses: egor-tensin/setup-mingw@v2
+      with:
+        platform: x64
 
     - name: Build
       run: ./build.sh ${{ matrix.job.target }}
@@ -54,18 +68,26 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build-mac:
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [macOS-latest]
+        os: [macOS-latest, windows-latest]
         include:
         - os: macOS-latest
           install-deps: |
              brew install nasm
           package-cmd: zip -r macOS.zip dist
           package-file: macOS.zip
+        - os: windows-latest
+          install-deps: |
+             curl -LO https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip
+             7z x nasm-2.15.05-win64.zip
+             cp nasm-2.15.05/nasm.exe /usr/bin/nasm.exe
+             rm /usr/bin/link.exe
+          package-cmd: 7z a Windows.zip dist
+          package-file: Windows.zip
     steps:
     - uses: actions/checkout@v2
 
