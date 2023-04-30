@@ -34,7 +34,7 @@ jobs:
       if: matrix.job.target == 'x86_64-w64-mingw32'
       shell: bash
       run: |
-        sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 yasm make automake autoconf git pkg-config libtool nasm mercurial cmake
+        sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
         #sudo apt install mingw-w64 mingw-w64-dev mingw-w64-tools -y
 
     - name: Build
