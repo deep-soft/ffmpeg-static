@@ -11,22 +11,16 @@ on:
 
 jobs:
   build-docker:
+    name: Linux and Windows
     runs-on: ${{ matrix.job.os }}
     container: docker://hhmhh/ffmpeg_build:latest
     strategy:
       fail-fast: false
       matrix:
         job:
-          - {
-                name: Linux,
-                os: ubuntu-latest,
-                target: x86_64-unknown-linux-gnu,
-            }
-          - { name: Windows,
-              os: ubuntu-latest,
-              target: x86_64-w64-mingw32,
-            }
-
+          - { name: Linux,   os: ubuntu-latest, target: x86_64-unknown-linux-gnu, }
+          - { name: Windows, os: ubuntu-latest, target: x86_64-w64-mingw32,       }
+      
     steps:
     - uses: actions/checkout@v2
 
@@ -60,12 +54,12 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build:
+  build-mac:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: macOS-latest
+        os: [macOS-latest]
         include:
         - os: macOS-latest
           install-deps: |
