@@ -19,6 +19,10 @@ fi
 
 [ -z "$TARGET_OS" ] && export TARGET_OS="$HOST_OS"
 
+if [[ "$1" == "x86_64-w64-mingw32" ]]; then
+    export TARGET_OS="windows"
+fi
+
 export NPROCS="$(nproc || echo 4)"
 
 ./download.sh
