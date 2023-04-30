@@ -11,7 +11,7 @@ on:
 
 jobs:
   build-docker:
-    name: Linux and Windows
+    name: build-docker
     runs-on: ${{ matrix.job.os }}
     container: docker://hhmhh/ffmpeg_build:latest
     strategy:
