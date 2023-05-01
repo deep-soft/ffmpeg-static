@@ -34,13 +34,13 @@ jobs:
 #      if: matrix.job.target == 'x86_64-w64-mingw32'
       shell: bash
       run: |
-        sudo apt update
-        sudo apt install yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
+        sudo apt update;
+        sudo apt install yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y;
 
-        if [[ ${{ matrix.job.target }} == 'x86_64-w64-mingw32' ]]; then
-          sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 -y
+        if [[ ${{ matrix.job.target }} == "x86_64-w64-mingw32" ]]; then
+          sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 -y;
           #sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
-        fi
+        fi;
 
     - name: Download ffmpeg git
       run: |
@@ -49,8 +49,9 @@ jobs:
       shell: bash
 
     - name: Build ffmpeg
-      run: ./build.sh ${{ matrix.job.target }}
       shell: bash
+      run: |
+        ./build.sh ${{ matrix.job.target }}
 
     - name: Debug
       if: failure()
@@ -101,22 +102,23 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install deps
+      shell: bash
       run: |
         ${{ matrix.install-deps }}
-      shell: bash
 
     - name: Download ffmpeg git
+      shell: bash
       run: |
         ./download.sh
-      shell: bash
 
     - name: Microsoft Visual C for Windows build
       if: matrix.os == 'windows-latest'
       uses: ilammy/msvc-dev-cmd@v1
 
     - name: Build ffmpeg
-      run: ./build.sh
       shell: bash
+      run: |
+        ./build.sh
 
     - name: Debug
       if: failure()
