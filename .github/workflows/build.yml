@@ -1,4 +1,4 @@
-# 2023-05-01 19:00
+# 2023-05-01 19:10
 name: Build - latest
 
 on:
@@ -21,37 +21,36 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        job: [Linux, Windows]
-        include:
-        - job: Linux
-          name: Linux
-          os: ubuntu-latest
-          target: x86_64-unknown-linux-gnu
-          install-deps: |
-            sudo apt update
-            sudo apt install yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
-        - job: Windows
-          name: Windows
-          os: ubuntu-latest
-          target: x86_64-w64-mingw32
-          install-deps: |
-            sudo apt update
-            sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
+        job:
+          - { name: Linux,   os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
+          - { name: Windows, os: ubuntu-latest, target: x86_64-w64-mingw32       }
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Download deps
+    - name: Install deps
+#    - name: Set up MinGW for Windows on Linux
+#      if: matrix.job.target == 'x86_64-w64-mingw32'
       shell: bash
       run: |
-        ${{ matrix.job.install-deps }}
-        ./download.sh
+        sudo apt update
+        sudo apt install yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
 
-    - name: Build
+        if [[ ${{ matrix.job.target }} == 'x86_64-w64-mingw32' ]]; then
+          sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 -y
+          #sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
+        fi
+
+    - name: Download ffmpeg git
+      run: |
+#        ${{ matrix.install-deps }}
+        ./download.sh
       shell: bash
-      run:
-        ./build.sh ${{ matrix.job.target }}
+
+    - name: Build ffmpeg
+      run: ./build.sh ${{ matrix.job.target }}
+      shell: bash
 
     - name: Debug
       if: failure()
@@ -60,14 +59,14 @@ jobs:
         name: debug
         path: .
 
-    - name: Package
+    - name: Package release
       shell: bash
       run: |
         package_file=${{ env.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip
         cd dist && zip -r $package_file .
         echo "package_file=$package_file" >> GITHUB_ENV
 
-    - name: Publish
+    - name: Publish release
       uses: softprops/action-gh-release@v1
       # if: startsWith(github.ref, 'refs/tags/')
       with:
@@ -99,21 +98,25 @@ jobs:
 #          package-cmd: 7z a Windows.zip dist
 #          package-file: Windows.zip
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-    - name: Download deps
-      shell: bash
+    - name: Install deps
       run: |
         ${{ matrix.install-deps }}
-        ./download.sh
-
-    - uses: ilammy/msvc-dev-cmd@v1
-
-    - name: Build
       shell: bash
-      run:
-        ./build.sh
+
+    - name: Download ffmpeg git
+      run: |
+        ./download.sh
+      shell: bash
+
+    - name: Microsoft Visual C for Windows build
+      if: matrix.os == 'windows-latest'
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Build ffmpeg
+      run: ./build.sh
+      shell: bash
 
     - name: Debug
       if: failure()
@@ -122,14 +125,13 @@ jobs:
         name: debug
         path: .
 
-    - name: Package
-      shell: bash
+    - name: Package release
       run: |
         package_file=${{ env.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip
         cd dist && zip -r $package_file .
         echo "package_file=$package_file" >> GITHUB_ENV
 
-    - name: Publish
+    - name: Publish release
       uses: deep-soft/action-gh-release@v1
       # if: startsWith(github.ref, 'refs/tags/')
       with:
