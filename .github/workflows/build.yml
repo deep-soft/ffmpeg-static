@@ -28,7 +28,7 @@ jobs:
             install-deps: |
               sudo apt update
               sudo apt install yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
-            package-file: ${{ matrix.job.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip
+            package-file: ${{ job.prog_name }}-${{ job.name }}-${{ job.target}}.zip
             #package-cmd: cd dist && zip -r ${{ matrix.job.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip .
             #package-cmd: cd dist && zip -r ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
             #package-cmd: cd dist && zip -r $prog_name-$job.name-$job.target.zip .
