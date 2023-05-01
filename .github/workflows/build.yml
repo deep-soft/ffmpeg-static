@@ -82,14 +82,14 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - os: [macOS-latest]
-          # os: [macOS-latest, windows-latest]
-            include:
-            - os: macOS-latest
-              name: MacOS
-              target: x86_64-apple-darwin
-              install-deps: |
-                brew install nasm
+          - { name: MacOS,   os: macOS-latest, target: x86_64-apple-darwin }
+        include:
+          - os: macOS-latest
+            name: MacOS
+            target: x86_64-apple-darwin
+            install-deps: |
+              brew install nasm
+#          - os: [macOS-latest, windows-latest]
 #            - os: windows-latest
 #              install-deps: |
 #                 curl -LO https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip
@@ -105,6 +105,7 @@ jobs:
     - name: Install deps
       shell: bash
       run: |
+        brew install nasm
         ${{ matrix.job.install-deps }}
 
     - name: Download ffmpeg git
