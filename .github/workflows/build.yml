@@ -11,6 +11,7 @@ on:
 #   branches: [ master ]
 
 env:
+  prog_name: ffmpeg-static
   TAG_NAME: release
 
 jobs:
@@ -21,26 +22,17 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { os_name: Linux,   prog_name: ffmpeg-static, os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
-          - { os_name: Windows, prog_name: ffmpeg-static, os: ubuntu-latest, target: x86_64-w64-mingw32       }
+          - { os_name: Linux,   os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
+          - { os_name: Windows, os: ubuntu-latest, target: x86_64-w64-mingw32       }
         include:
           - os_name: Linux
             install-deps: |
               sudo apt update
               sudo apt install yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
-            package-file: ${{ job.prog_name }}-${{ job.name }}-${{ job.target}}.zip
-            #package-cmd: cd dist && zip -r ${{ matrix.job.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip .
-            #package-cmd: cd dist && zip -r ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
-            #package-cmd: cd dist && zip -r $prog_name-$job.name-$job.target.zip .
           - os_name: Windows
             install-deps: |
               sudo apt update
               sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
-            package-file: ${{ matrix.job.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip
-            package-cmd: cd dist && zip -r ${{ matrix.job.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip .
-            #package-file: $prog_name-$job.name-$job.target.zip
-            #package-cmd: cd dist && zip -r ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
-            #package-cmd: cd dist && zip -r $prog_name-$job.name-$job.target.zip .
 
     steps:
     - uses: actions/checkout@v2
@@ -66,7 +58,9 @@ jobs:
     - name: Package
       shell: bash
       run: |
-        ${{ matrix.package-cmd }}
+        package_file=${{ env.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip
+        cd dist && zip -r $package_file .
+        echo "package_file=$package_file" >> GITHUB_ENV
 
     - name: Publish
       uses: softprops/action-gh-release@v1
@@ -75,26 +69,23 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}      
           draft: true          
           files: |
-            ${{ matrix.job.name }}.zip
+            ${{ env.package_file }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build-mac:
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         job:
-          - { os_name: MacOS  , prog_name: ffmpeg-static, os: macos-latest , target: x86_64-apple-darwin      }
+          - { os_name: MacOS  , os: macos-latest , target: x86_64-apple-darwin      }
         include:
           - os_name: MacOS
             install-deps: |
               brew install nasm
-            package-file: ${{ matrix.job.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip
-            package-cmd: cd dist && zip -r ${{ matrix.job.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip .
-#
-#        - { prog_name: ffmpeg-static, name: Windows, os: windows-latest, target: x86_64-w64-mingw32       }
-#        - name: Windows
+#        - { os_name: Windows, os: windows-latest, target: x86_64-w64-mingw32       }
+#        - os_name: Windows
 #          install-deps: |
 #             curl -LO https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip
 #             7z x nasm-2.15.05-win64.zip
@@ -126,9 +117,10 @@ jobs:
         path: .
 
     - name: Package
-      shell: bash
       run: |
-        ${{ matrix.package-cmd }}
+        package_file=${{ env.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip
+        cd dist && zip -r $package_file .
+        echo "package_file=$package_file" >> GITHUB_ENV
 
     - name: Publish
       uses: deep-soft/action-gh-release@v1
@@ -137,6 +129,6 @@ jobs:
           draft: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            ${{ matrix.package-file }}
+            ${{ env.package_file }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
