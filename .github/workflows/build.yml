@@ -34,7 +34,7 @@ jobs:
           install-deps: |
             sudo apt update
             sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
-          package-file: ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip
+          package-file: $prog_name-$job.name-$job.target.zip
           #package-cmd: cd dist && zip -r ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
           package-cmd: cd dist && zip -r $package-file .
           
@@ -88,7 +88,7 @@ jobs:
         - name: MacOS
           install-deps: |
              brew install nasm
-          package-file: ${{ matrix.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip
+          package-file: $prog_name-$job.name-$job.target.zip
           package-cmd: cd dist && zip -r ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
 #        - name: Windows
 #          install-deps: |
