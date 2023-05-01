@@ -111,14 +111,14 @@ jobs:
     - name: Install deps
       shell: bash
       run: |
-        echo "== brew install deps v1 begin ==";
-        brew install nasm;
-        echo "== brew install deps v1 end ==";
+        echo "== brew install deps v1 begin =="
+        brew install nasm
+        echo "== brew install deps v1 end =="
 
-        echo "== brew install deps v2 begin ==";
-        echo "== ${{ matrix.job.install-deps }} ==";
-        ${{ matrix.job.install-deps }};
-        echo "== brew install deps v2 end ==";
+        echo "== brew install deps v2 begin =="
+        echo "== ${{ matrix.job.install-deps }} =="
+        ${{ matrix.job.install-deps }}
+        echo "== brew install deps v2 end =="
 
     - name: Download ffmpeg git
       shell: bash
