@@ -1,4 +1,4 @@
-# 2023-05-01 15:20
+# 2023-05-01 17:00
 name: Build - latest
 
 on:
@@ -9,6 +9,9 @@ on:
 #      - v*
 #  pull_request:
 #   branches: [ master ]
+env:
+  NAME: ffmpeg-static
+  TAG_NAME: release
 
 jobs:
   build-docker:
@@ -20,27 +23,35 @@ jobs:
         job:
           - { name: Linux,   os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
           - { name: Windows, os: ubuntu-latest, target: x86_64-w64-mingw32       }
-
+        include:
+        - name: Linux
+          install-deps: |
+            sudo apt update
+            sudo apt install yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
+          package-file: ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip
+          #package-cmd: cd dist && zip -r ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
+          package-cmd: cd dist && zip -r $package-file .
+        - name: Windows
+          install-deps: |
+            sudo apt update
+            sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
+          package-file: ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip
+          #package-cmd: cd dist && zip -r ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
+          package-cmd: cd dist && zip -r $package-file .
+          
     steps:
     - uses: actions/checkout@v2
 
     - name: Download deps
+      shell: bash
       run: |
         ${{ matrix.install-deps }}
         ./download.sh
-      shell: bash
-
-    - name: Set up MinGW for Windows on Linux
-      if: matrix.job.target == 'x86_64-w64-mingw32'
-      shell: bash
-      run: |
-        sudo apt update
-        sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
-        #sudo apt install mingw-w64 mingw-w64-dev mingw-w64-tools -y
 
     - name: Build
-      run: ./build.sh ${{ matrix.job.target }}
       shell: bash
+      run: |
+        ./build.sh ${{ matrix.job.target }}
 
     - name: Debug
       if: failure()
@@ -50,15 +61,19 @@ jobs:
         path: .
 
     - name: Package
-      run: zip -r ${{ matrix.job.name }}.zip dist
       shell: bash
+      run: |
+        cd dist
+        ${{ matrix.package-cmd }}
 
     - name: Publish
       uses: softprops/action-gh-release@v1
       # if: startsWith(github.ref, 'refs/tags/')
       with:
-          files: ${{ matrix.job.name }}.zip
-          draft: true
+          tag_name: ${{ env.TAG_NAME }}      
+          draft: true          
+          files: |
+            ${{ matrix.job.name }}.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -67,36 +82,38 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macOS-latest]
-        # os: [macOS-latest, windows-latest]
+        job:
+          - { name: MacOS,   os: macOS-latest, target: x86_64-w64 }
+          #- { name: Windows, os: windows-latest, target: x86_64-w64-mingw32       }
         include:
-        - os: macOS-latest
+        - name: MacOS
           install-deps: |
              brew install nasm
-          package-cmd: zip -r macOS.zip dist
-          package-file: macOS.zip
-#        - os: windows-latest
+          package-file: ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip
+          package-cmd: cd dist && zip -r ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
+#        - name: Windows
 #          install-deps: |
 #             curl -LO https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip
 #             7z x nasm-2.15.05-win64.zip
 #             cp nasm-2.15.05/nasm.exe /usr/bin/nasm.exe
 #             rm /usr/bin/link.exe
-#          package-cmd: 7z a Windows.zip dist
+#          package-cmd: cd dist && 7z a ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
 #          package-file: Windows.zip
     steps:
     - uses: actions/checkout@v2
 
     - name: Download deps
+      shell: bash
       run: |
         ${{ matrix.install-deps }}
         ./download.sh
-      shell: bash
 
     - uses: ilammy/msvc-dev-cmd@v1
 
     - name: Build
-      run: ./build.sh
       shell: bash
+      run: |
+        ./build.sh
 
     - name: Debug
       if: failure()
@@ -106,15 +123,17 @@ jobs:
         path: .
 
     - name: Package
-      run: ${{ matrix.package-cmd }}
       shell: bash
+      run: |
+        ${{ matrix.package-cmd }}
 
     - name: Publish
-      uses: softprops/action-gh-release@v1
+      uses: deep-soft/action-gh-release@v1
       # if: startsWith(github.ref, 'refs/tags/')
       with:
+          draft: true
+          tag_name: ${{ env.TAG_NAME }}
           files: |
             ${{ matrix.package-file }}
-          draft: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
