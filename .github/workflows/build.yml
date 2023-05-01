@@ -63,7 +63,13 @@ jobs:
       run: |
         package_file=${{ env.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip
         cd dist && zip -r $package_file .
-        echo "package_file=$package_file" >> GITHUB_ENV
+        echo "package_file=$package_file" >> $GITHUB_ENV
+
+    - name: List package_file
+      shell: bash
+      run: |
+        echo "== env.package_file == "
+        echo ${{ env.package_file }}
 
     - name: Publish release
       uses: softprops/action-gh-release@v1
@@ -139,7 +145,13 @@ jobs:
       run: |
         package_file=${{ env.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip
         cd dist && zip -r $package_file .
-        echo "package_file=$package_file" >> GITHUB_ENV
+        echo "package_file=$package_file" >> $GITHUB_ENV
+
+    - name: List package_file
+      shell: bash
+      run: |
+        echo "== env.package_file == "
+        echo ${{ env.package_file }}
 
     - name: Publish release
       uses: deep-soft/action-gh-release@v1
