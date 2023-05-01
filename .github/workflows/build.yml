@@ -89,7 +89,7 @@ jobs:
           install-deps: |
              brew install nasm
           package-file: $prog_name-$job.name-$job.target.zip
-          package-cmd: cd dist && zip -r ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
+          package-cmd: cd dist && zip -r $package-file .
 #        - name: Windows
 #          install-deps: |
 #             curl -LO https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip
