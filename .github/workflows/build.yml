@@ -27,7 +27,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
 #    - name: Set up MinGW for Windows on Linux
 #      if: matrix.job.target == 'x86_64-w64-mingw32'
@@ -53,7 +53,7 @@ jobs:
 
     - name: Debug
       if: failure()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: debug
         path: .
