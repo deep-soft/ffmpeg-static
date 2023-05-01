@@ -62,7 +62,6 @@ jobs:
     - name: Package
       shell: bash
       run: |
-        cd dist
         ${{ matrix.package-cmd }}
 
     - name: Publish
@@ -82,14 +81,15 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { prog_name: ffmpeg-static, name: MacOS,   os: macOS-latest, target: x86_64-w64 }
-          #- { prog_name: ffmpeg-static, name: Windows, os: windows-latest, target: x86_64-w64-mingw32       }
+          - { prog_name: ffmpeg-static, name: MacOS,   os: macOS-latest, target: x86_64-apple-darwin }
         include:
         - name: MacOS
           install-deps: |
              brew install nasm
           package-file: $prog_name-$job.name-$job.target.zip
           package-cmd: cd dist && zip -r $package-file .
+#
+#        - { prog_name: ffmpeg-static, name: Windows, os: windows-latest, target: x86_64-w64-mingw32       }
 #        - name: Windows
 #          install-deps: |
 #             curl -LO https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip
