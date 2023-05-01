@@ -1,4 +1,4 @@
-# 2023-05-01 19:10
+# 2023-05-01 19:50
 name: Build - latest
 
 on:
@@ -72,7 +72,7 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           draft: true
           files: |
-            ${{ env.package_file }}
+            dist/${{ env.package_file }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -81,28 +81,31 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macOS-latest]
-        # os: [macOS-latest, windows-latest]
-        include:
-        - os: macOS-latest
-          name: MacOS
-          install-deps: |
-             brew install nasm
-#        - os: windows-latest
-#          install-deps: |
-#             curl -LO https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip
-#             7z x nasm-2.15.05-win64.zip
-#             cp nasm-2.15.05/nasm.exe /usr/bin/nasm.exe
-#             rm /usr/bin/link.exe
-#          package-cmd: 7z a Windows.zip dist
-#          package-file: Windows.zip
+        job:
+          os: [macOS-latest]
+          # os: [macOS-latest, windows-latest]
+          include:
+          - os: macOS-latest
+            name: MacOS
+            target: x86_64-apple-darwin
+            install-deps: |
+               brew install nasm
+#          - os: windows-latest
+#            install-deps: |
+#               curl -LO https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip
+#               7z x nasm-2.15.05-win64.zip
+#               cp nasm-2.15.05/nasm.exe /usr/bin/nasm.exe
+#               rm /usr/bin/link.exe
+#            package-cmd: 7z a Windows.zip dist
+#            package-file: Windows.zip
+
     steps:
     - uses: actions/checkout@v2
 
     - name: Install deps
       shell: bash
       run: |
-        ${{ matrix.install-deps }}
+        ${{ matrix.job.install-deps }}
 
     - name: Download ffmpeg git
       shell: bash
@@ -110,7 +113,7 @@ jobs:
         ./download.sh
 
     - name: Microsoft Visual C for Windows build
-      if: matrix.os == 'windows-latest'
+      if: matrix.job.os == 'windows-latest'
       uses: ilammy/msvc-dev-cmd@v1
 
     - name: Build ffmpeg
@@ -138,6 +141,6 @@ jobs:
           draft: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            ${{ env.package_file }}
+            dist/${{ env.package_file }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
