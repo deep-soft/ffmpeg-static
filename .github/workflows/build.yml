@@ -15,15 +15,16 @@ env:
 jobs:
   build-docker:
     runs-on: ${{ matrix.job.os }}
-    container: docker://hhmhh/ffmpeg_build:latest
     strategy:
       fail-fast: false
       matrix:
         job:
-          - { prog_name: ffmpeg-static, name: Linux,   os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
+          - { prog_name: ffmpeg-static, name: Linux  , os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
           - { prog_name: ffmpeg-static, name: Windows, os: ubuntu-latest, target: x86_64-w64-mingw32       }
+          - { prog_name: ffmpeg-static, name: MacOS  , os: macOS-latest , target: x86_64-apple-darwin      }          
         include:
         - name: Linux
+          container: docker://hhmhh/ffmpeg_build:latest
           install-deps: |
             sudo apt update
             sudo apt install yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
@@ -31,13 +32,17 @@ jobs:
           #package-cmd: cd dist && zip -r ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
           package-cmd: cd dist && zip -r $package-file .
         - name: Windows
+          container: docker://hhmhh/ffmpeg_build:latest
           install-deps: |
             sudo apt update
             sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
           package-file: $prog_name-$job.name-$job.target.zip
           #package-cmd: cd dist && zip -r ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
           package-cmd: cd dist && zip -r $package-file .
-          
+        - name: MacOS
+          install-deps: |
+            brew install nasm
+
     steps:
     - uses: actions/checkout@v2
 
@@ -75,17 +80,17 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build:
+  build-mac:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         job:
-          - { prog_name: ffmpeg-static, name: MacOS,   os: macOS-latest, target: x86_64-apple-darwin }
+          - { prog_name: ffmpeg-static, name: MacOS  , os: macOS-latest , target: x86_64-apple-darwin      }
         include:
         - name: MacOS
           install-deps: |
-             brew install nasm
+            brew install nasm
           package-file: $prog_name-$job.name-$job.target.zip
           package-cmd: cd dist && zip -r $package-file .
 #
