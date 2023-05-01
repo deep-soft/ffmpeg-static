@@ -28,16 +28,19 @@ jobs:
             install-deps: |
               sudo apt update
               sudo apt install yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
-            package-file: $prog_name-$job.name-$job.target.zip
+            package-file: ${{ matrix.job.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip
+            #package-cmd: cd dist && zip -r ${{ matrix.job.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip .
             #package-cmd: cd dist && zip -r ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
-            package-cmd: cd dist && zip -r $package-file .
+            #package-cmd: cd dist && zip -r $prog_name-$job.name-$job.target.zip .
           - os_name: Windows
             install-deps: |
               sudo apt update
               sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
-            package-file: $prog_name-$job.name-$job.target.zip
+            package-file: ${{ matrix.job.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip
+            package-cmd: cd dist && zip -r ${{ matrix.job.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip .
+            #package-file: $prog_name-$job.name-$job.target.zip
             #package-cmd: cd dist && zip -r ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
-            package-cmd: cd dist && zip -r $package-file .
+            #package-cmd: cd dist && zip -r $prog_name-$job.name-$job.target.zip .
 
     steps:
     - uses: actions/checkout@v2
@@ -87,8 +90,8 @@ jobs:
           - os_name: MacOS
             install-deps: |
               brew install nasm
-            package-file: $prog_name-$job.name-$job.target.zip
-            package-cmd: cd dist && zip -r $package-file .
+            package-file: ${{ matrix.job.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip
+            package-cmd: cd dist && zip -r ${{ matrix.job.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip .
 #
 #        - { prog_name: ffmpeg-static, name: Windows, os: windows-latest, target: x86_64-w64-mingw32       }
 #        - name: Windows
