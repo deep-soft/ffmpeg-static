@@ -1,4 +1,4 @@
-# 2023-05-01 18:00
+# 2023-05-01 19:00
 name: Build - latest
 
 on:
@@ -21,31 +21,36 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        job:
-          - { os_name: Linux,   os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
-          - { os_name: Windows, os: ubuntu-latest, target: x86_64-w64-mingw32       }
+        job: [Linux, Windows]
         include:
-          - os_name: Linux
-            install-deps: |
-              sudo apt update
-              sudo apt install yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
-          - os_name: Windows
-            install-deps: |
-              sudo apt update
-              sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
+        - job: Linux
+          name: Linux
+          os: ubuntu-latest
+          target: x86_64-unknown-linux-gnu
+          install-deps: |
+            sudo apt update
+            sudo apt install yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
+        - job: Windows
+          name: Windows
+          os: ubuntu-latest
+          target: x86_64-w64-mingw32
+          install-deps: |
+            sudo apt update
+            sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
 
     - name: Download deps
       shell: bash
       run: |
-        ${{ matrix.install-deps }}
+        ${{ matrix.job.install-deps }}
         ./download.sh
 
     - name: Build
       shell: bash
-      run: |
+      run:
         ./build.sh ${{ matrix.job.target }}
 
     - name: Debug
@@ -66,8 +71,8 @@ jobs:
       uses: softprops/action-gh-release@v1
       # if: startsWith(github.ref, 'refs/tags/')
       with:
-          tag_name: ${{ env.TAG_NAME }}      
-          draft: true          
+          tag_name: ${{ env.TAG_NAME }}
+          draft: true
           files: |
             ${{ env.package_file }}
       env:
@@ -78,23 +83,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        job:
-          - { os_name: MacOS  , os: macos-latest , target: x86_64-apple-darwin      }
+        os: [macOS-latest]
+        # os: [macOS-latest, windows-latest]
         include:
-          - os_name: MacOS
-            install-deps: |
-              brew install nasm
-#        - { os_name: Windows, os: windows-latest, target: x86_64-w64-mingw32       }
-#        - os_name: Windows
+        - os: macOS-latest
+          name: MacOS
+          install-deps: |
+             brew install nasm
+#        - os: windows-latest
 #          install-deps: |
 #             curl -LO https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip
 #             7z x nasm-2.15.05-win64.zip
 #             cp nasm-2.15.05/nasm.exe /usr/bin/nasm.exe
 #             rm /usr/bin/link.exe
-#          package-file: ${{ matrix.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip
-#          package-cmd: cd dist && 7z a $package-file .
+#          package-cmd: 7z a Windows.zip dist
+#          package-file: Windows.zip
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
 
     - name: Download deps
       shell: bash
@@ -106,7 +112,7 @@ jobs:
 
     - name: Build
       shell: bash
-      run: |
+      run:
         ./build.sh
 
     - name: Debug
@@ -117,6 +123,7 @@ jobs:
         path: .
 
     - name: Package
+      shell: bash
       run: |
         package_file=${{ env.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target}}.zip
         cd dist && zip -r $package_file .
