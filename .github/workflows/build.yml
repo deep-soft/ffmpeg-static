@@ -10,7 +10,6 @@ on:
 #  pull_request:
 #   branches: [ master ]
 env:
-  NAME: ffmpeg-static
   TAG_NAME: release
 
 jobs:
@@ -21,14 +20,14 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { name: Linux,   os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
-          - { name: Windows, os: ubuntu-latest, target: x86_64-w64-mingw32       }
+          - { prog_name: ffmpeg-static, name: Linux,   os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
+          - { prog_name: ffmpeg-static, name: Windows, os: ubuntu-latest, target: x86_64-w64-mingw32       }
         include:
         - name: Linux
           install-deps: |
             sudo apt update
             sudo apt install yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
-          package-file: ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip
+          package-file: ${{ matrix.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip
           #package-cmd: cd dist && zip -r ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
           package-cmd: cd dist && zip -r $package-file .
         - name: Windows
@@ -83,13 +82,13 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { name: MacOS,   os: macOS-latest, target: x86_64-w64 }
-          #- { name: Windows, os: windows-latest, target: x86_64-w64-mingw32       }
+          - { prog_name: ffmpeg-static, name: MacOS,   os: macOS-latest, target: x86_64-w64 }
+          #- { prog_name: ffmpeg-static, name: Windows, os: windows-latest, target: x86_64-w64-mingw32       }
         include:
         - name: MacOS
           install-deps: |
              brew install nasm
-          package-file: ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip
+          package-file: ${{ matrix.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip
           package-cmd: cd dist && zip -r ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
 #        - name: Windows
 #          install-deps: |
@@ -97,8 +96,8 @@ jobs:
 #             7z x nasm-2.15.05-win64.zip
 #             cp nasm-2.15.05/nasm.exe /usr/bin/nasm.exe
 #             rm /usr/bin/link.exe
-#          package-cmd: cd dist && 7z a ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
-#          package-file: Windows.zip
+#          package-file: ${{ matrix.prog_name }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip
+#          package-cmd: cd dist && 7z a $package-file .
     steps:
     - uses: actions/checkout@v2
 
