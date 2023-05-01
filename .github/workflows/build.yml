@@ -19,11 +19,11 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { prog_name: ffmpeg-static, name: Linux  , os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
-          - { prog_name: ffmpeg-static, name: Windows, os: ubuntu-latest, target: x86_64-w64-mingw32       }
-          - { prog_name: ffmpeg-static, name: MacOS  , os: macOS-latest , target: x86_64-apple-darwin      }          
+          - { prog_name: ffmpeg-static, os_name: Linux  , os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
+          - { prog_name: ffmpeg-static, os_name: Windows, os: ubuntu-latest, target: x86_64-w64-mingw32       }
+          - { prog_name: ffmpeg-static, os_name: MacOS  , os: macOS-latest , target: x86_64-apple-darwin      }          
         include:
-        - name: Linux
+        - os_name: Linux
           container: docker://hhmhh/ffmpeg_build:latest
           install-deps: |
             sudo apt update
@@ -31,7 +31,7 @@ jobs:
           package-file: $prog_name-$job.name-$job.target.zip
           #package-cmd: cd dist && zip -r ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
           package-cmd: cd dist && zip -r $package-file .
-        - name: Windows
+        - os_name: Windows
           container: docker://hhmhh/ffmpeg_build:latest
           install-deps: |
             sudo apt update
@@ -39,7 +39,7 @@ jobs:
           package-file: $prog_name-$job.name-$job.target.zip
           #package-cmd: cd dist && zip -r ${{ env.NAME }}-${{ matrix.job.name }}-${{ matrix.job.target }}.zip .
           package-cmd: cd dist && zip -r $package-file .
-        - name: MacOS
+        - os_name: MacOS
           install-deps: |
             brew install nasm
 
@@ -86,9 +86,9 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { prog_name: ffmpeg-static, name: MacOS  , os: macOS-latest , target: x86_64-apple-darwin      }
+          - { prog_name: ffmpeg-static, os_name: MacOS  , os: macOS-latest , target: x86_64-apple-darwin      }
         include:
-        - name: MacOS
+        - os_name: MacOS
           install-deps: |
             brew install nasm
           package-file: $prog_name-$job.name-$job.target.zip
