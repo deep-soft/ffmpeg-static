@@ -29,22 +29,20 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Install deps
 #    - name: Set up MinGW for Windows on Linux
 #      if: matrix.job.target == 'x86_64-w64-mingw32'
+    - name: Install deps
       shell: bash
       run: |
         sudo apt update;
         sudo apt install yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y;
-
-        if [[ ${{ matrix.job.target }}=="x86_64-w64-mingw32" ]]; then
+        if [ "${{ matrix.job.target }}" = "x86_64-w64-mingw32" ]; then
           sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 -y;
           #sudo apt install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 yasm make automake autoconf git pkg-config libtool nasm mercurial cmake -y
         fi;
 
     - name: Download ffmpeg git
       run: |
-#        ${{ matrix.install-deps }}
         ./download.sh
       shell: bash
 
